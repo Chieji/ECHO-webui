@@ -29,3 +29,11 @@
 - [x] Add Echoctl config panel in Settings
 - [x] Reference Echoctl in Agent management (echoctl as agent provider)
 - [x] Push to Chieji/ECHOMEN (overwrite)
+- [x] Set up Supabase credentials (SUPABASE_URL, SUPABASE_KEY)
+- [x] Install @supabase/supabase-js client
+- [ ] Create Supabase auth client utility
+- [ ] Build sign-in page (email/password + social providers)
+- [ ] Build sign-up page with email confirmation
+- [ ] Integrate Supabase auth state into DashboardLayout
+- [ ] Add protected route guards
+- [ ] Write vitest tests for auth flow
