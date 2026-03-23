@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
+  Terminal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -26,6 +27,7 @@ import { trpc } from "@/lib/trpc";
 
 const TABS = [
   { id: "general", label: "General", icon: SettingsIcon },
+  { id: "echoctl", label: "Echoctl CLI", icon: Terminal },
   { id: "api-keys", label: "API Keys", icon: Key },
   { id: "integrations", label: "Integrations", icon: Plug },
   { id: "advanced", label: "Advanced", icon: Sliders },
@@ -44,6 +46,7 @@ const INTEGRATIONS = [
   { name: "Jira", description: "Issue tracking and project management", connected: false, icon: "📋" },
   { name: "Notion", description: "Documentation and knowledge base", connected: false, icon: "📝" },
   { name: "Linear", description: "Issue tracking for engineering teams", connected: true, icon: "🔷" },
+  { name: "Echoctl CLI", description: "Terminal AI agent with BDI engine and 14+ providers", connected: false, icon: "🖥️" },
 ];
 
 const stagger = { animate: { transition: { staggerChildren: 0.05 } } };
@@ -205,6 +208,84 @@ export default function Settings() {
                     {updateBatchMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                     Save Changes
                   </Button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "echoctl" && (
+              <div className="glass-panel rounded-xl p-6 space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[oklch(0.55_0.2_270)] to-[oklch(0.45_0.25_300)] flex items-center justify-center">
+                    <Terminal className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-base font-semibold text-foreground">Echoctl CLI Configuration</h3>
+                    <p className="text-xs text-muted-foreground">Bridge your terminal to the ECHOMEN web dashboard</p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-glass border border-glass-border space-y-3">
+                  <h4 className="text-sm font-medium text-foreground">Connection Status</h4>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-muted-foreground/50" />
+                    <span className="text-sm text-muted-foreground">Disconnected — Run <code className="font-mono text-[oklch(0.55_0.2_270)]">echoctl connect</code> to bridge</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-glass border border-glass-border space-y-3">
+                  <h4 className="text-sm font-medium text-foreground">Quick Setup</h4>
+                  <div className="space-y-2">
+                    <div className="p-3 rounded-lg bg-background/50 font-mono text-xs text-muted-foreground">
+                      <p className="text-[oklch(0.7_0.17_165)]">{'# Install Echoctl globally'}</p>
+                      <p>$ npm install -g @echomen/echoctl</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background/50 font-mono text-xs text-muted-foreground">
+                      <p className="text-[oklch(0.7_0.17_165)]">{'# Authenticate with your provider keys'}</p>
+                      <p>$ echoctl auth setup</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background/50 font-mono text-xs text-muted-foreground">
+                      <p className="text-[oklch(0.7_0.17_165)]">{'# Connect to this ECHOMEN dashboard'}</p>
+                      <p>$ echoctl connect --url ws://localhost:3000/ws/echo</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-glass border border-glass-border space-y-3">
+                  <h4 className="text-sm font-medium text-foreground">Echoctl Capabilities</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg bg-background/50">
+                      <p className="text-sm font-medium text-foreground">BDI Engine</p>
+                      <p className="text-xs text-muted-foreground">Belief-Desire-Intention cognitive architecture</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background/50">
+                      <p className="text-sm font-medium text-foreground">14+ Providers</p>
+                      <p className="text-xs text-muted-foreground">OpenAI, Anthropic, Google, Groq, and more</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background/50">
+                      <p className="text-sm font-medium text-foreground">Multi-layer Memory</p>
+                      <p className="text-xs text-muted-foreground">Working, episodic, and long-term memory</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background/50">
+                      <p className="text-sm font-medium text-foreground">Code Summarizer</p>
+                      <p className="text-xs text-muted-foreground">AI-powered codebase analysis via CLI</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background/50">
+                      <p className="text-sm font-medium text-foreground">WebHawk 2.0</p>
+                      <p className="text-xs text-muted-foreground">Visual + AXTree browser reasoning</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background/50">
+                      <p className="text-sm font-medium text-foreground">Plugin System</p>
+                      <p className="text-xs text-muted-foreground">MCP + native plugin extensibility</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-[oklch(0.55_0.2_270/8%)] border border-[oklch(0.55_0.2_270/20%)]">
+                  <p className="text-sm text-foreground">Learn more about Echoctl at{" "}
+                    <a href="https://github.com/Chieji/Echoctl" target="_blank" rel="noopener noreferrer" className="text-[oklch(0.55_0.2_270)] hover:underline inline-flex items-center gap-1">
+                      github.com/Chieji/Echoctl <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </p>
                 </div>
               </div>
             )}

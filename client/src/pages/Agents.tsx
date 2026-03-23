@@ -147,6 +147,7 @@ export default function Agents() {
             <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">Agent Orchestration</h1>
             <p className="text-sm text-muted-foreground mt-1">
               {agents ? `${agents.length} agent${agents.length !== 1 ? "s" : ""} deployed` : "Loading..."}
+              {" "}<span className="text-[oklch(0.55_0.2_270)]">Powered by Echoctl</span>
             </p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -189,6 +190,8 @@ export default function Agents() {
                     <option value="GPT-4o">GPT-4o</option>
                     <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet</option>
                     <option value="Gemini Pro">Gemini Pro</option>
+                    <option value="Echoctl BDI">Echoctl BDI Engine</option>
+                    <option value="Echoctl Chain">Echoctl Provider Chain (14+)</option>
                   </select>
                 </div>
                 <Button

@@ -126,6 +126,9 @@ export default function CodeSummarizer() {
           <p className="text-sm text-muted-foreground mt-1 max-w-lg">
             Paste any code snippet and get a structured AI-generated analysis with architecture insights, patterns, and security review.
           </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Also available via CLI: <code className="font-mono text-[oklch(0.55_0.2_270)] bg-glass px-1.5 py-0.5 rounded">echoctl summarize &lt;path&gt;</code>
+          </p>
         </div>
       </motion.div>
 

@@ -23,4 +23,9 @@
 - [x] Wire Code Summarizer page to backend API
 - [x] Wire Settings page to persistence API
 - [x] Code review and refactor
-- [ ] Push to GitHub
+- [x] Push to GitHub
+- [x] Add Echoctl CLI integration to Code Summarizer (call echoctl summarize)
+- [x] Add Echoctl connection status to Dashboard
+- [x] Add Echoctl config panel in Settings
+- [x] Reference Echoctl in Agent management (echoctl as agent provider)
+- [x] Push to Chieji/ECHOMEN (overwrite)

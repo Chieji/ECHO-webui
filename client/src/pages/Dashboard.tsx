@@ -15,6 +15,9 @@ import {
   Zap,
   Activity,
   TrendingUp,
+  Terminal,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -129,6 +132,34 @@ export default function Dashboard() {
             </div>
           );
         })}
+      </motion.div>
+
+      {/* Echoctl CLI Connection Status */}
+      <motion.div variants={fadeUp} className="glass-panel rounded-xl p-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[oklch(0.55_0.2_270)] to-[oklch(0.45_0.25_300)] flex items-center justify-center">
+              <Terminal className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="font-display text-sm font-semibold text-foreground">Echoctl CLI Bridge</h3>
+              <p className="text-xs text-muted-foreground">Connect your terminal to ECHOMEN via <code className="font-mono text-[oklch(0.55_0.2_270)]">echoctl connect</code></p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <WifiOff className="w-4 h-4 text-muted-foreground" />
+            <span className="text-xs font-mono text-muted-foreground">Disconnected</span>
+          </div>
+        </div>
+        <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1"><Bot className="w-3 h-3" /> BDI Engine</span>
+          <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> 14+ Providers</span>
+          <span className="flex items-center gap-1"><Activity className="w-3 h-3" /> Multi-layer Memory</span>
+          <span className="flex items-center gap-1"><Code2 className="w-3 h-3" /> Code Summarizer</span>
+        </div>
+        <div className="mt-3 p-3 rounded-lg bg-glass border border-glass-border">
+          <p className="text-xs font-mono text-muted-foreground">$ echoctl connect --url ws://localhost:3000/ws/echo</p>
+        </div>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
