@@ -1,6 +1,6 @@
 /*
  * Chat — "Glass Horizon" Design
- * AI conversation interface with message bubbles, typing indicator, and model selector
+ * AI conversation interface wired to tRPC backend with real LLM responses
  */
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,35 +11,33 @@ import {
   User,
   Sparkles,
   Copy,
-  RotateCcw,
-  ChevronDown,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Streamdown } from "streamdown";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 const CHAT_ACCENT = "https://d2xsxph8kpxj0f.cloudfront.net/310519663083178937/BswsvvE8gzMytEWPKpnfeT/echomen-chat-accent-2o4ABkYxzq8vzi6qiYWS6f.webp";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-}
-
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: "1",
-    role: "assistant",
-    content: "Hello! I'm **ECHOMEN**, your AI orchestration assistant. I can help you manage agents, analyze code, execute tasks, and much more.\n\nWhat would you like to work on today?",
-    timestamp: new Date(Date.now() - 60000),
-  },
-];
-
 export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  const utils = trpc.useUtils();
+  const { data: history, isLoading: historyLoading } = trpc.chat.history.useQuery();
+  const sendMutation = trpc.chat.send.useMutation({
+    onSuccess: () => {
+      utils.chat.history.invalidate();
+      utils.dashboard.stats.invalidate();
+    },
+    onError: (err) => toast.error(err.message),
+  });
+  const clearMutation = trpc.chat.clear.useMutation({
+    onSuccess: () => {
+      utils.chat.history.invalidate();
+      toast.success("Chat history cleared");
+    },
+  });
+
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -50,33 +48,12 @@ export default function Chat() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping]);
+  }, [history, sendMutation.isPending]);
 
   const handleSend = () => {
-    if (!input.trim()) return;
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input.trim(),
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
+    if (!input.trim() || sendMutation.isPending) return;
+    sendMutation.mutate({ message: input.trim(), model: selectedModel });
     setInput("");
-    setIsTyping(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: `I understand you're asking about: **"${userMsg.content}"**\n\nThis is a demo of the ECHOMEN chat interface. In production, this would connect to the ECHOMEN backend and route your request through the appropriate AI agent.\n\nHere's what I can help with:\n- \`/agents\` — Manage your AI agents\n- \`/summarize <path>\` — Summarize a codebase\n- \`/execute <task>\` — Run a task through an agent\n\nWould you like to try any of these?`,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMsg]);
-      setIsTyping(false);
-    }, 1500);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -85,6 +62,8 @@ export default function Chat() {
       handleSend();
     }
   };
+
+  const messages = history ?? [];
 
   return (
     <div className="flex flex-col h-full -m-6">
@@ -100,7 +79,7 @@ export default function Chat() {
           <div>
             <h2 className="font-display text-sm font-semibold text-foreground">ECHOMEN Chat</h2>
             <p className="text-[11px] text-muted-foreground">
-              {isTyping ? "Thinking..." : "Online"}
+              {sendMutation.isPending ? "Thinking..." : "Online"}
             </p>
           </div>
         </div>
@@ -114,68 +93,88 @@ export default function Chat() {
             <option value="Claude 3.5">Claude 3.5 Sonnet</option>
             <option value="Gemini Pro">Gemini Pro</option>
           </select>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8 text-muted-foreground hover:text-destructive"
+            onClick={() => clearMutation.mutate()}
+            title="Clear chat"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-        <AnimatePresence>
-          {messages.map((msg) => (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-            >
-              {msg.role === "assistant" && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[oklch(0.55_0.2_270)] to-[oklch(0.6_0.15_180)] flex items-center justify-center shrink-0 mt-1">
-                  <Bot className="w-4 h-4 text-white" />
-                </div>
-              )}
-              <div
-                className={`max-w-[70%] rounded-xl px-4 py-3 ${
-                  msg.role === "user"
-                    ? "bg-gradient-to-r from-[oklch(0.55_0.2_270)] to-[oklch(0.5_0.22_280)] text-white"
-                    : "glass-panel"
-                }`}
+        {historyLoading ? (
+          <div className="text-center py-12">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[oklch(0.55_0.2_270)] to-[oklch(0.6_0.15_180)] flex items-center justify-center mx-auto mb-3 animate-pulse">
+              <Bot className="w-4 h-4 text-white" />
+            </div>
+            <p className="text-sm text-muted-foreground">Loading conversation...</p>
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[oklch(0.55_0.2_270)] to-[oklch(0.6_0.15_180)] flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="font-display text-lg font-semibold text-foreground mb-2">Start a conversation</h3>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              Ask me anything — I can help you manage agents, analyze code, execute tasks, and much more.
+            </p>
+          </div>
+        ) : (
+          <AnimatePresence>
+            {messages.map((msg) => (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+                className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                <div className="text-sm leading-relaxed">
-                  <Streamdown>{msg.content}</Streamdown>
-                </div>
-                <div className={`flex items-center gap-2 mt-2 ${msg.role === "user" ? "justify-end" : "justify-between"}`}>
-                  <span className={`text-[10px] font-mono ${msg.role === "user" ? "text-white/60" : "text-muted-foreground"}`}>
-                    {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  </span>
-                  {msg.role === "assistant" && (
-                    <div className="flex items-center gap-1">
+                {msg.role === "assistant" && (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[oklch(0.55_0.2_270)] to-[oklch(0.6_0.15_180)] flex items-center justify-center shrink-0 mt-1">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                )}
+                <div
+                  className={`max-w-[70%] rounded-xl px-4 py-3 ${
+                    msg.role === "user"
+                      ? "bg-gradient-to-r from-[oklch(0.55_0.2_270)] to-[oklch(0.5_0.22_280)] text-white"
+                      : "glass-panel"
+                  }`}
+                >
+                  <div className="text-sm leading-relaxed">
+                    <Streamdown>{msg.content}</Streamdown>
+                  </div>
+                  <div className={`flex items-center gap-2 mt-2 ${msg.role === "user" ? "justify-end" : "justify-between"}`}>
+                    <span className={`text-[10px] font-mono ${msg.role === "user" ? "text-white/60" : "text-muted-foreground"}`}>
+                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                    {msg.role === "assistant" && (
                       <button
                         onClick={() => { navigator.clipboard.writeText(msg.content); toast.success("Copied!"); }}
                         className="p-1 rounded hover:bg-glass-hover text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <Copy className="w-3 h-3" />
                       </button>
-                      <button
-                        onClick={() => toast.info("Feature coming soon")}
-                        className="p-1 rounded hover:bg-glass-hover text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <RotateCcw className="w-3 h-3" />
-                      </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-              {msg.role === "user" && (
-                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-1">
-                  <User className="w-4 h-4 text-muted-foreground" />
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </AnimatePresence>
+                {msg.role === "user" && (
+                  <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-1">
+                    <User className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        )}
 
         {/* Typing indicator */}
-        {isTyping && (
+        {sendMutation.isPending && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -203,7 +202,7 @@ export default function Chat() {
             variant="ghost"
             size="icon"
             className="shrink-0 text-muted-foreground hover:text-foreground hover:bg-glass-hover w-9 h-9"
-            onClick={() => toast.info("Feature coming soon")}
+            onClick={() => toast.info("File attachment coming soon")}
           >
             <Paperclip className="w-4 h-4" />
           </Button>
@@ -219,7 +218,7 @@ export default function Chat() {
           />
           <Button
             onClick={handleSend}
-            disabled={!input.trim()}
+            disabled={!input.trim() || sendMutation.isPending}
             className="shrink-0 bg-gradient-to-r from-[oklch(0.55_0.2_270)] to-[oklch(0.6_0.15_180)] hover:opacity-90 text-white border-0 w-9 h-9 p-0 disabled:opacity-30"
           >
             <Send className="w-4 h-4" />

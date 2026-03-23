@@ -10,8 +10,8 @@ import Agents from "./pages/Agents";
 import Chat from "./pages/Chat";
 import CodeSummarizer from "./pages/CodeSummarizer";
 import Settings from "./pages/Settings";
-
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <DashboardLayout>
       <Switch>

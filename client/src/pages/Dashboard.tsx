@@ -1,6 +1,6 @@
 /*
  * Dashboard — "Glass Horizon" Design
- * Hero banner with generated background, KPI stat cards, recent activity timeline, quick action grid
+ * Hero banner, live KPI stats from DB, recent activity timeline, quick action grid
  */
 import { motion } from "framer-motion";
 import {
@@ -15,27 +15,13 @@ import {
   Zap,
   Activity,
   TrendingUp,
-  FileCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { formatDistanceToNow } from "date-fns";
 
 const HERO_BG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663083178937/BswsvvE8gzMytEWPKpnfeT/echomen-hero-bg-7ujoqQK6AicdcX4hFTFkGy.webp";
-
-const STATS = [
-  { label: "Active Agents", value: "12", change: "+3", icon: Bot, color: "from-[oklch(0.55_0.2_270)] to-[oklch(0.5_0.22_280)]" },
-  { label: "Tasks Completed", value: "1,847", change: "+128", icon: CheckCircle2, color: "from-[oklch(0.7_0.17_165)] to-[oklch(0.6_0.15_180)]" },
-  { label: "Avg Response", value: "1.2s", change: "-0.3s", icon: Clock, color: "from-[oklch(0.6_0.18_250)] to-[oklch(0.55_0.2_270)]" },
-  { label: "CPU Usage", value: "34%", change: "-5%", icon: Cpu, color: "from-[oklch(0.75_0.15_80)] to-[oklch(0.65_0.17_60)]" },
-];
-
-const RECENT_ACTIVITY = [
-  { time: "2 min ago", action: "Agent 'Researcher' completed web scraping task", status: "success" },
-  { time: "8 min ago", action: "Code summarization finished for /src/core/engine.ts", status: "success" },
-  { time: "15 min ago", action: "Agent 'Coder' started PR review #42", status: "running" },
-  { time: "32 min ago", action: "New agent 'DataAnalyst' created and deployed", status: "success" },
-  { time: "1 hr ago", action: "System health check passed — all services operational", status: "info" },
-];
 
 const QUICK_ACTIONS = [
   { label: "New Agent", icon: Bot, href: "/agents", desc: "Create and deploy" },
@@ -56,25 +42,53 @@ const fadeUp = {
 };
 
 export default function Dashboard() {
+  const { data: stats, isLoading: statsLoading } = trpc.dashboard.stats.useQuery();
+  const { data: activity, isLoading: activityLoading } = trpc.dashboard.activity.useQuery();
+
+  const statCards = [
+    {
+      label: "Active Agents",
+      value: statsLoading ? "—" : String(stats?.activeAgents ?? 0),
+      change: `/${stats?.totalAgents ?? 0} total`,
+      icon: Bot,
+      color: "from-[oklch(0.55_0.2_270)] to-[oklch(0.5_0.22_280)]",
+    },
+    {
+      label: "Tasks Completed",
+      value: statsLoading ? "—" : String(stats?.totalTasks ?? 0),
+      change: "all time",
+      icon: CheckCircle2,
+      color: "from-[oklch(0.7_0.17_165)] to-[oklch(0.6_0.15_180)]",
+    },
+    {
+      label: "Messages",
+      value: statsLoading ? "—" : String(stats?.totalMessages ?? 0),
+      change: "total",
+      icon: Clock,
+      color: "from-[oklch(0.6_0.18_250)] to-[oklch(0.55_0.2_270)]",
+    },
+    {
+      label: "System Status",
+      value: "Online",
+      change: "healthy",
+      icon: Cpu,
+      color: "from-[oklch(0.75_0.15_80)] to-[oklch(0.65_0.17_60)]",
+    },
+  ];
+
   return (
     <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-6">
       {/* Hero Banner */}
-      <motion.div
-        variants={fadeUp}
-        className="relative rounded-xl overflow-hidden h-48"
-      >
-        <img
-          src={HERO_BG}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      <motion.div variants={fadeUp} className="relative rounded-xl overflow-hidden h-48">
+        <img src={HERO_BG} alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-transparent" />
         <div className="relative z-10 flex flex-col justify-center h-full px-8">
           <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">
             Welcome back, K
           </h1>
           <p className="mt-2 text-muted-foreground max-w-md">
-            Your AI orchestration platform is running smoothly. 12 agents are active and processing tasks.
+            Your AI orchestration platform is running smoothly.{" "}
+            {stats ? `${stats.activeAgents} agent${stats.activeAgents !== 1 ? "s" : ""} active.` : "Loading..."}
           </p>
           <div className="mt-4 flex gap-3">
             <Link href="/chat">
@@ -95,13 +109,10 @@ export default function Dashboard() {
 
       {/* KPI Stats */}
       <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS.map((stat) => {
+        {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div
-              key={stat.label}
-              className="glass-panel rounded-xl p-5 group"
-            >
+            <div key={stat.label} className="glass-panel rounded-xl p-5 group">
               <div className="flex items-start justify-between">
                 <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
                   <Icon className="w-5 h-5 text-white" />
@@ -130,25 +141,36 @@ export default function Dashboard() {
             </Button>
           </div>
           <div className="space-y-4">
-            {RECENT_ACTIVITY.map((item, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className="mt-1.5">
-                  <div
-                    className={`w-2 h-2 rounded-full pulse-dot ${
-                      item.status === "success"
-                        ? "bg-[oklch(0.7_0.17_165)] text-[oklch(0.7_0.17_165)]"
-                        : item.status === "running"
-                        ? "bg-[oklch(0.55_0.2_270)] text-[oklch(0.55_0.2_270)]"
-                        : "bg-muted-foreground text-muted-foreground"
-                    }`}
-                  />
+            {activityLoading ? (
+              <p className="text-sm text-muted-foreground">Loading activity...</p>
+            ) : activity && activity.length > 0 ? (
+              activity.map((item) => (
+                <div key={item.id} className="flex items-start gap-3">
+                  <div className="mt-1.5">
+                    <div
+                      className={`w-2 h-2 rounded-full pulse-dot ${
+                        item.status === "success"
+                          ? "bg-[oklch(0.7_0.17_165)] text-[oklch(0.7_0.17_165)]"
+                          : item.status === "error"
+                          ? "bg-[oklch(0.65_0.22_15)] text-[oklch(0.65_0.22_15)]"
+                          : "bg-muted-foreground text-muted-foreground"
+                      }`}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-foreground/90">{item.action}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 font-mono">
+                      {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm text-foreground/90">{item.action}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5 font-mono">{item.time}</p>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <Activity className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No activity yet. Create an agent to get started!</p>
               </div>
-            ))}
+            )}
           </div>
         </motion.div>
 

@@ -1,0 +1,26 @@
+# Project TODO
+
+- [x] Basic Glass Horizon UI theme and layout
+- [x] Dashboard page with hero, KPI stats, activity, quick actions
+- [x] Agents page with agent cards and management
+- [x] Chat page with AI conversation UI
+- [x] Code Summarizer page
+- [x] Settings page with tabbed interface
+- [x] Mobile responsive layout
+- [x] Upgrade to web-db-user (backend, database, auth)
+- [x] Define database schema (agents, chat_messages, settings, activity_log)
+- [x] Push database migrations
+- [x] Create tRPC routers for Agents CRUD
+- [x] Create tRPC router for Dashboard stats and activity
+- [x] Create tRPC router for Chat with SSE streaming
+- [x] Create tRPC router for Code Summarizer
+- [x] Create tRPC router for Settings persistence
+- [x] Create SSE endpoint for real-time agent status
+- [x] Write vitest tests for backend routes
+- [x] Wire Dashboard page to live backend data
+- [x] Wire Agents page to live CRUD + real-time status
+- [x] Wire Chat page to streaming AI API
+- [x] Wire Code Summarizer page to backend API
+- [x] Wire Settings page to persistence API
+- [x] Code review and refactor
+- [ ] Push to GitHub

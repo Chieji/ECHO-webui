@@ -19,9 +19,12 @@ import {
   Search,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 
 const NAV_ITEMS = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -47,6 +50,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = useState(false);
   const [location] = useLocation();
   const isMobile = useIsMobile();
+  const { user, isAuthenticated, logout } = useAuth();
 
   // Close mobile sidebar on navigation
   useEffect(() => {
@@ -231,9 +235,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Bell className="w-4 h-4" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[oklch(0.6_0.2_15)]" />
               </Button>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[oklch(0.55_0.2_270)] to-[oklch(0.6_0.15_180)] flex items-center justify-center text-xs font-bold text-white">
-                K
-              </div>
+              {isAuthenticated ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[oklch(0.55_0.2_270)] to-[oklch(0.6_0.15_180)] flex items-center justify-center text-xs font-bold text-white">
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => logout()}
+                    className="text-muted-foreground hover:text-foreground hover:bg-glass-hover"
+                    title="Sign out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { window.location.href = getLoginUrl(); }}
+                  className="text-muted-foreground hover:text-foreground hover:bg-glass-hover"
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
           </header>
 
