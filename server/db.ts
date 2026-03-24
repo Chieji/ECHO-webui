@@ -178,3 +178,34 @@ export async function getDashboardStats() {
     totalMessages: Number(msgRows[0]?.total ?? 0),
   };
 }
+
+// ─── Onboarding ──────────────────────────────────────────────────────────────
+
+import { OnboardingSession, InsertOnboardingSession, onboardingSessions } from "../drizzle/schema";
+
+export async function getOnboardingSession(userId: number): Promise<OnboardingSession | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(onboardingSessions).where(eq(onboardingSessions.userId, userId)).limit(1);
+  return result[0];
+}
+
+export async function createOnboardingSession(data: InsertOnboardingSession): Promise<OnboardingSession | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.insert(onboardingSessions).values(data);
+  const insertId = result[0].insertId;
+  return db.select().from(onboardingSessions).where(eq(onboardingSessions.id, insertId)).limit(1).then(r => r[0]);
+}
+
+export async function updateOnboardingSession(userId: number, data: Partial<InsertOnboardingSession>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(onboardingSessions).set({ ...data, updatedAt: new Date() }).where(eq(onboardingSessions.userId, userId));
+}
+
+export async function updateUserOnboarding(userId: number, data: { onboardingCompleted?: number; onboardingStep?: number; firstAgentCreated?: number }): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(users).set({ ...data, updatedAt: new Date() }).where(eq(users.id, userId));
+}

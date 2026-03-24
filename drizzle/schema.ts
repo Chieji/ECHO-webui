@@ -13,6 +13,9 @@ export const users = mysqlTable("users", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
+  onboardingCompleted: int("onboardingCompleted").default(0).notNull(),
+  onboardingStep: int("onboardingStep").default(0).notNull(),
+  firstAgentCreated: int("firstAgentCreated").default(0).notNull(),
 });
 
 export type User = typeof users.$inferSelect;
@@ -77,3 +80,19 @@ export const activityLog = mysqlTable("activity_log", {
 
 export type ActivityLogEntry = typeof activityLog.$inferSelect;
 export type InsertActivityLogEntry = typeof activityLog.$inferInsert;
+
+/**
+ * Onboarding sessions to track wizard progress per user.
+ */
+export const onboardingSessions = mysqlTable("onboarding_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  currentStep: int("currentStep").default(0).notNull(),
+  cliConnected: int("cliConnected").default(0).notNull(),
+  firstAgentId: int("firstAgentId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type OnboardingSession = typeof onboardingSessions.$inferSelect;
+export type InsertOnboardingSession = typeof onboardingSessions.$inferInsert;
