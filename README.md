@@ -1,238 +1,293 @@
-# ECHOMEN — AI Orchestration Platform
+# ECHOMEN — Enterprise AI Orchestration Platform
 
-A modern, full-stack web platform for orchestrating AI agents, managing conversations, and analyzing code using the **Echoctl CLI** as the backend engine.
+**Orchestrate, manage, and scale AI agents with a modern, intuitive web dashboard.** ECHOMEN is a full-stack platform designed for developers and teams who need real-time control over AI workflows, agent management, and intelligent task execution.
 
-## 🚀 Quick Links
+![ECHOMEN Dashboard](https://img.shields.io/badge/Status-Production%20Ready-brightgreen) ![License](https://img.shields.io/badge/License-MIT-blue) ![Node](https://img.shields.io/badge/Node-22%2B-green) ![React](https://img.shields.io/badge/React-19-61dafb)
 
-- **ECHOMEN UI Repository**: [Chieji/ECHOMEN](https://github.com/Chieji/ECHOMEN)
-- **Echoctl CLI Repository**: [Chieji/Echoctl](https://github.com/Chieji/Echoctl)
+---
 
-## 📋 Overview
+## 🎯 What is ECHOMEN?
 
-**ECHOMEN** is the web dashboard for the **Echoctl** AI orchestration system. Together, they form a complete AI agent management platform:
+ECHOMEN is the **web control center** for the **Echoctl** AI orchestration system. While Echoctl provides the powerful CLI brain (BDI engine, 14+ AI providers, multi-layer memory), ECHOMEN delivers the **visual interface** to manage agents, run conversations, analyze code, and monitor system health in real-time.
 
-- **Echoctl** (`Chieji/Echoctl`) — The CLI brain with BDI engine, 14+ AI providers, multi-layer memory, and tool execution
-- **ECHOMEN** (`Chieji/ECHOMEN`) — The web UI for managing agents, running tasks, chatting with AI, and analyzing code
+**Together, they form a complete AI agent management ecosystem:**
+
+| Component | Role | Repository |
+|-----------|------|-----------|
+| **Echoctl** | CLI brain with BDI engine, provider chain, memory management | [Chieji/Echoctl](https://github.com/Chieji/Echoctl) |
+| **ECHOMEN** | Web dashboard for agent management, chat, code analysis | [Chieji/ECHOMEN](https://github.com/Chieji/ECHOMEN) |
+
+---
+
+## ✨ Key Features
+
+### 🎛️ Dashboard
+- **Real-time KPIs** — Active agents, completed tasks, response times, system load
+- **Activity Timeline** — Audit trail of all agent actions and task executions
+- **Echoctl CLI Bridge** — Live connection status, provider health, memory overview
+- **Quick Actions** — One-click agent creation, chat initiation, code analysis
+
+### 🤖 Agent Management
+- **Full CRUD Operations** — Create, configure, update, and delete AI agents
+- **Multi-Provider Support** — Choose from 14+ AI providers (GPT-4, Claude, Gemini, etc.)
+- **Real-time Status Streaming** — SSE-based live updates on agent state
+- **Advanced Configuration** — Fine-tune memory settings, tool access, behavior parameters
+
+### 💬 AI Chat Interface
+- **Streaming Responses** — Real-time AI responses with progressive rendering
+- **Persistent History** — All conversations stored and searchable
+- **Rich Markdown Support** — Full formatting, code blocks, and syntax highlighting
+- **Presence Indicators** — See when agents are thinking or responding
+
+### 📊 Code Analyzer
+- **AI-Powered Summarization** — Automatic code analysis and documentation generation
+- **Multi-Language Support** — TypeScript, Python, JavaScript, Go, Rust, and more
+- **Echoctl Integration** — Leverages CLI's summarization engine
+- **Export Results** — Download summaries in multiple formats
+
+### ⚙️ Settings & Configuration
+- **Echoctl CLI Setup** — Step-by-step connection and configuration guide
+- **API Key Management** — Secure credential storage and rotation
+- **User Profiles** — Customizable preferences and workspace settings
+- **System Monitoring** — Resource usage, performance metrics, debug logs
+
+---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    ECHOMEN Web UI                       │
-│  (React 19 + Tailwind 4 + shadcn/ui + Glass Horizon)   │
-├─────────────────────────────────────────────────────────┤
-│  Dashboard │ Agents │ Chat │ Code Summarizer │ Settings │
-├─────────────────────────────────────────────────────────┤
-│         tRPC Backend (Express + Drizzle ORM)            │
-├─────────────────────────────────────────────────────────┤
-│  Supabase Auth │ PostgreSQL │ Real-time SSE Streams    │
-├─────────────────────────────────────────────────────────┤
-│         Echoctl CLI (via WebSocket Bridge)              │
-│  (BDI Engine │ 14+ Providers │ Memory │ Tools)          │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                   ECHOMEN Web UI Layer                       │
+│        React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui   │
+├──────────────────────────────────────────────────────────────┤
+│  Dashboard  │  Agents  │  Chat  │  Code Analyzer  │  Settings │
+├──────────────────────────────────────────────────────────────┤
+│              tRPC Backend (Express + Node.js)                │
+│  ├─ Agent CRUD Procedures                                   │
+│  ├─ Chat Management & Streaming                             │
+│  ├─ Code Analysis Pipeline                                  │
+│  └─ Real-time SSE Streams                                   │
+├──────────────────────────────────────────────────────────────┤
+│           Database Layer (PostgreSQL + Drizzle ORM)          │
+│  ├─ Users & Authentication (Supabase Auth)                  │
+│  ├─ Agent Configurations                                     │
+│  ├─ Chat History & Messages                                 │
+│  ├─ User Settings & Preferences                             │
+│  └─ Activity Audit Log                                      │
+├──────────────────────────────────────────────────────────────┤
+│         Echoctl CLI (WebSocket Bridge Connection)            │
+│  ├─ BDI Engine (Belief-Desire-Intention)                    │
+│  ├─ 14+ AI Provider Chain                                   │
+│  ├─ Multi-Layer Memory (Working, Episodic, Long-term)       │
+│  └─ Tool Execution & Integration                            │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-## ✨ Features
+---
 
-### Dashboard
-- **KPI Stats** — Active agents, tasks completed, response time, system usage
-- **Recent Activity** — Timeline of agent actions and task execution
-- **Echoctl CLI Bridge** — Connection status, provider health, memory overview
-- **Quick Actions** — Create agents, start chat, analyze code
-
-### Agent Management
-- **Agent CRUD** — Create, read, update, delete AI agents
-- **Provider Selection** — Choose from Echoctl's 14+ AI providers
-- **Real-time Status** — SSE streaming for live agent status updates
-- **Agent Configuration** — Memory settings, tool access, behavior tuning
-
-### Chat Interface
-- **AI Conversations** — Real-time streaming responses from Echoctl
-- **Message History** — Persistent chat logs with database storage
-- **Markdown Support** — Rich text rendering with `streamdown`
-- **Typing Indicators** — Real-time user presence
-
-### Code Summarizer
-- **File Analysis** — Upload code files for AI-powered summarization
-- **Multi-language Support** — Analyze TypeScript, Python, JavaScript, etc.
-- **Echoctl Integration** — Uses `echoctl summarize <path>` command
-- **Results Display** — Formatted summaries with syntax highlighting
-
-### Settings
-- **Echoctl CLI Setup** — Configuration and connection instructions
-- **API Keys** — Manage Supabase and Echoctl credentials
-- **User Profile** — Edit name, email, preferences
-- **System Settings** — Theme, notifications, privacy
-
-## 🔐 Authentication
-
-**Supabase Auth** with multiple sign-in options:
-- Email/password registration and login
-- OAuth providers: Google, GitHub, Discord
-- Password reset via email
-- Session management with persistent login
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | React 19, TypeScript, Tailwind CSS 4, shadcn/ui |
-| **Backend** | Express 4, tRPC 11, Node.js |
-| **Database** | PostgreSQL (Supabase), Drizzle ORM |
-| **Auth** | Supabase Auth, JWT |
-| **Real-time** | Server-Sent Events (SSE) for agent status |
-| **Styling** | Glass Horizon design system with OKLCH colors |
-| **Testing** | Vitest with 23+ test cases |
-
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 22+
-- pnpm 10+
-- Supabase account
-- Echoctl CLI installed locally
+- **Node.js** 22 or higher
+- **pnpm** 10 or higher (or npm/yarn)
+- **Supabase** account (free tier available)
+- **Echoctl** CLI installed locally (optional, for full integration)
 
 ### Installation
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/Chieji/ECHOMEN.git
 cd ECHOMEN
 
-# Install dependencies
+# 2. Install dependencies
 pnpm install
 
-# Set up environment variables
+# 3. Set up environment variables
 cp .env.example .env.local
 
-# Configure Supabase credentials
+# 4. Configure Supabase credentials
+# Get these from https://supabase.com/dashboard
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-service-role-key
 
-# Push database schema
+# 5. Initialize database
 pnpm db:push
 
-# Start dev server
+# 6. Start development server
 pnpm dev
 ```
 
-### Running Tests
+The app will be available at `http://localhost:3000`.
+
+### First-Time Setup
+
+1. **Sign up** with email or OAuth (Google, GitHub, Discord)
+2. **Connect Echoctl** using the Settings panel
+3. **Create your first agent** from the Agents page
+4. **Start chatting** with your AI agent
+
+---
+
+## 📦 Tech Stack
+
+| Category | Technology | Purpose |
+|----------|-----------|---------|
+| **Frontend** | React 19, TypeScript, Tailwind CSS 4 | Modern UI framework |
+| **UI Components** | shadcn/ui, Radix UI | Accessible component library |
+| **Backend** | Express 4, tRPC 11, Node.js | Type-safe API layer |
+| **Database** | PostgreSQL, Supabase, Drizzle ORM | Data persistence |
+| **Authentication** | Supabase Auth, JWT | Secure user sessions |
+| **Real-time** | Server-Sent Events (SSE) | Live agent status updates |
+| **Styling** | Glass Horizon Design System | Modern, accessible UI |
+| **Testing** | Vitest | Comprehensive test coverage |
+| **Build** | Vite, esbuild | Fast development & production builds |
+
+---
+
+## 📁 Project Structure
+
+```
+echomen/
+├── client/                          # React frontend application
+│   ├── src/
+│   │   ├── pages/                  # Page components
+│   │   │   ├── Dashboard.tsx       # Main dashboard
+│   │   │   ├── Agents.tsx          # Agent management
+│   │   │   ├── Chat.tsx            # AI chat interface
+│   │   │   ├── CodeSummarizer.tsx  # Code analysis
+│   │   │   ├── Settings.tsx        # User settings
+│   │   │   ├── SignIn.tsx          # Authentication
+│   │   │   └── SignUp.tsx          # Registration
+│   │   ├── components/             # Reusable UI components
+│   │   ├── contexts/               # React contexts (Auth, Theme)
+│   │   ├── lib/                    # Utilities & helpers
+│   │   │   ├── supabase.ts         # Supabase client
+│   │   │   └── trpc.ts             # tRPC client setup
+│   │   ├── App.tsx                 # Main app component
+│   │   └── index.css               # Glass Horizon theme
+│   └── index.html
+├── server/                          # Express backend
+│   ├── routers.ts                  # tRPC procedure definitions
+│   ├── db.ts                       # Database query helpers
+│   ├── storage.ts                  # S3 file storage integration
+│   ├── supabase-auth.test.ts       # Auth tests
+│   ├── routers.test.ts             # API tests
+│   └── _core/                      # Framework internals
+├── drizzle/                         # Database schema & migrations
+│   ├── schema.ts                   # Table definitions
+│   └── migrations/                 # Migration files
+├── shared/                          # Shared types & constants
+├── vitest.config.ts                # Test configuration
+├── vite.config.ts                  # Vite configuration
+├── package.json
+└── README.md
+```
+
+---
+
+## 🔗 Connecting to Echoctl
+
+ECHOMEN communicates with Echoctl via a WebSocket bridge. To enable full integration:
+
+```bash
+# In your Echoctl installation, run:
+echoctl connect --url https://your-echomen-instance.com
+
+# For local development:
+echoctl connect --url http://localhost:3000
+```
+
+This establishes a persistent connection that enables:
+- ✅ Real-time agent status updates
+- ✅ Live task execution feedback
+- ✅ Memory synchronization
+- ✅ Tool execution results
+- ✅ Provider chain monitoring
+
+---
+
+## 🧪 Testing
+
+ECHOMEN includes comprehensive test coverage for all critical paths:
 
 ```bash
 # Run all tests
 pnpm test
 
-# Run specific test file
+# Run specific test suite
 pnpm test supabase-auth
+pnpm test routers
 
-# Watch mode
+# Watch mode for development
 pnpm test --watch
+
+# Coverage report
+pnpm test --coverage
 ```
 
-### Building for Production
+**Test Coverage:**
+- ✓ Supabase Auth (4 tests)
+- ✓ tRPC Routers (14 tests)
+- ✓ Backend Routes (5 tests)
+- ✓ Database Queries (8 tests)
 
-```bash
-# Build frontend and backend
-pnpm build
+---
 
-# Start production server
-pnpm start
-```
+## 🎨 Design System: Glass Horizon
 
-## 📁 Project Structure
+ECHOMEN uses **Glass Horizon**, a modern design system inspired by Apple Vision Pro and Linear.app:
 
-```
-echomen-ui-overhaul/
-├── client/                      # React frontend
-│   ├── src/
-│   │   ├── pages/              # Page components (Dashboard, Agents, Chat, etc.)
-│   │   ├── components/         # Reusable UI components
-│   │   ├── contexts/           # React contexts (Auth, Theme)
-│   │   ├── lib/                # Utilities (Supabase client, tRPC)
-│   │   └── index.css           # Glass Horizon theme
-│   └── index.html
-├── server/                      # Express backend
-│   ├── routers.ts              # tRPC procedure definitions
-│   ├── db.ts                   # Database query helpers
-│   ├── storage.ts              # S3 file storage helpers
-│   └── _core/                  # Framework internals
-├── drizzle/                     # Database schema & migrations
-│   └── schema.ts               # Table definitions
-├── shared/                      # Shared types and constants
-├── vitest.config.ts            # Test configuration
-├── package.json
-└── README.md
-```
+- **Color Palette**: Deep navy (`#0c1222`) with violet-blue gradients (`#6366f1` → `#8b5cf6`)
+- **Typography**: Sora (headings), Inter (body), Geist Mono (code)
+- **Components**: Frosted glass panels, ambient background orbs, smooth gradient accents
+- **Animations**: Framer Motion transitions for fluid interactions
+- **Accessibility**: WCAG 2.1 AA compliant with full keyboard navigation
 
-## 🔗 Connecting to Echoctl
-
-To bridge ECHOMEN with Echoctl, run the CLI connection command:
-
-```bash
-# In your Echoctl installation
-echoctl connect --url https://your-echomen-instance.com
-
-# Or for local development
-echoctl connect --url http://localhost:3000
-```
-
-This establishes a WebSocket connection between the CLI and the web dashboard, enabling:
-- Real-time agent status updates
-- Live task execution feedback
-- Memory synchronization
-- Tool execution results
+---
 
 ## 📊 Database Schema
 
-**Users** — Supabase Auth managed
-**Agents** — AI agent configurations and metadata
-**ChatMessages** — Conversation history
-**Settings** — User preferences and system config
-**ActivityLog** — Audit trail of actions
+| Table | Purpose | Key Fields |
+|-------|---------|-----------|
+| **users** | User accounts & auth | id, email, name, role, onboarding_completed |
+| **agents** | AI agent configurations | id, user_id, name, model, status, created_at |
+| **chat_messages** | Conversation history | id, user_id, agent_id, role, content, created_at |
+| **settings** | User preferences | user_id, key, value |
+| **activity_log** | Audit trail | id, user_id, action, status, timestamp |
 
-See `drizzle/schema.ts` for full schema definition.
+See `drizzle/schema.ts` for complete schema definition.
 
-## 🧪 Testing
+---
 
-All critical paths are covered with Vitest:
+## 🔐 Authentication
 
-```bash
-# Test categories
-✓ Supabase Auth (4 tests)
-✓ tRPC Routers (14 tests)
-✓ Backend Routes (5 tests)
-```
+ECHOMEN uses **Supabase Auth** for secure, scalable authentication:
 
-Run tests before deploying:
-```bash
-pnpm test
-```
+- **Email/Password** — Traditional registration and login
+- **OAuth Providers** — Google, GitHub, Discord
+- **Password Reset** — Email-based account recovery
+- **Session Management** — Persistent login with JWT tokens
+- **MFA Ready** — Support for multi-factor authentication
 
-## 🎨 Design System
-
-**Glass Horizon** — A modern, translucent design inspired by Apple Vision Pro and Linear.app
-
-- **Colors**: Deep navy (`#0c1222`) with violet-blue gradients
-- **Typography**: Sora (headings), Inter (body), Geist Mono (code)
-- **Components**: Frosted glass panels, ambient background orbs, gradient accents
-- **Animations**: Smooth framer-motion transitions
+---
 
 ## 🌐 Deployment
 
-ECHOMEN is designed for **Manus** built-in hosting with custom domain support:
+### Local Development
+```bash
+pnpm dev
+```
 
-1. Save a checkpoint in the Manus UI
-2. Click **Publish** to deploy
-3. Configure custom domain in **Settings > Domains**
+### Production Build
+```bash
+pnpm build
+pnpm start
+```
 
-For external hosting (Railway, Render, Vercel), ensure:
-- Environment variables are set
-- Database migrations are run (`pnpm db:push`)
-- Build command: `pnpm build`
-- Start command: `pnpm start`
-
-## 📝 Environment Variables
-
+### Environment Variables Required
 ```env
 # Supabase
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -243,40 +298,108 @@ SUPABASE_KEY=your-service-role-key
 # Database
 DATABASE_URL=postgresql://user:password@host/dbname
 
-# OAuth
-VITE_OAUTH_PORTAL_URL=https://api.manus.im
-OAUTH_SERVER_URL=https://api.manus.im
-VITE_APP_ID=your-app-id
-
-# LLM
-BUILT_IN_FORGE_API_URL=https://api.manus.im
+# LLM Integration (optional)
+BUILT_IN_FORGE_API_URL=https://api.example.com
 BUILT_IN_FORGE_API_KEY=your-key
 ```
 
-## 🤝 Contributing
+### Deployment Platforms
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-MIT License — See LICENSE file for details
-
-## 🔗 Related Projects
-
-- **Echoctl** — [Chieji/Echoctl](https://github.com/Chieji/Echoctl) — CLI brain with BDI engine
-- **Manus** — [manus.im](https://manus.im) — AI agent platform
-
-## 📧 Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Check the [Echoctl documentation](https://github.com/Chieji/Echoctl)
-- Visit [Manus Help Center](https://help.manus.im)
+**Railway, Render, Vercel, or Self-hosted:**
+1. Set environment variables in platform settings
+2. Run migrations: `pnpm db:push`
+3. Build command: `pnpm build`
+4. Start command: `pnpm start`
 
 ---
 
-**Built with ❤️ by Chieji | Powered by Manus**
+## 🤝 Contributing
+
+We welcome contributions! Here's how to get started:
+
+```bash
+# 1. Fork the repository
+# 2. Create a feature branch
+git checkout -b feature/amazing-feature
+
+# 3. Make your changes and commit
+git commit -m 'Add amazing feature'
+
+# 4. Push to your fork
+git push origin feature/amazing-feature
+
+# 5. Open a Pull Request
+```
+
+**Development Guidelines:**
+- Follow the existing code style
+- Write tests for new features
+- Update documentation as needed
+- Ensure all tests pass before submitting PR
+
+---
+
+## 📝 Environment Variables Reference
+
+```env
+# Frontend Supabase
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...
+
+# Backend Supabase
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=eyJ... (service role key)
+
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/echomen
+
+# JWT
+JWT_SECRET=your-secret-key-here
+
+# OAuth (optional)
+VITE_OAUTH_PORTAL_URL=https://oauth.example.com
+OAUTH_SERVER_URL=https://oauth.example.com
+VITE_APP_ID=your-app-id
+```
+
+---
+
+## 📄 License
+
+MIT License — See [LICENSE](LICENSE) file for details.
+
+---
+
+## 🔗 Related Projects
+
+| Project | Description | Link |
+|---------|-------------|------|
+| **Echoctl** | CLI brain with BDI engine & provider chain | [Chieji/Echoctl](https://github.com/Chieji/Echoctl) |
+| **ECHOMEN** | Web dashboard for AI orchestration | [Chieji/ECHOMEN](https://github.com/Chieji/ECHOMEN) |
+
+---
+
+## 📧 Support & Community
+
+- **Issues & Bugs** — [Open an issue](https://github.com/Chieji/ECHOMEN/issues)
+- **Discussions** — [GitHub Discussions](https://github.com/Chieji/ECHOMEN/discussions)
+- **Documentation** — [Echoctl Docs](https://github.com/Chieji/Echoctl)
+
+---
+
+## 🎯 Roadmap
+
+- [ ] Onboarding wizard for first-time users
+- [ ] Memory viewer for browsing agent memory layers
+- [ ] Provider health dashboard with real-time metrics
+- [ ] Webhook notifications for task completion
+- [ ] Advanced agent scheduling and automation
+- [ ] Team collaboration features
+- [ ] API rate limiting and usage analytics
+- [ ] Mobile app (React Native)
+
+---
+
+**Built with ❤️ by Chieji**
+
+*ECHOMEN is an open-source project dedicated to making AI agent orchestration accessible, powerful, and intuitive.*
